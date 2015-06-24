@@ -16,42 +16,33 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by mars on 6/22/15.
  */
-public class GLRenderer implements GLSurfaceView.Renderer {
+public class GR implements GLSurfaceView.Renderer {
 
-    private final float[] mtrxProjection = new float[16];
-    private final float[] mtrxView = new float[16];
-    private final float[] mtrxProjectionAndView = new float[16];
-
-    // Geometric variables
-    public static float vertices[];
-    public static short indices[];
-    public FloatBuffer vertexBuffer;
-    public ShortBuffer drawListBuffer;
+    private final float[] projM = new float[16];
+    private final float[] viewM = new float[16];
+    private final float[] projViewM = new float[16];
 
     // Our screenresolution
-    float   mScreenWidth = 1280;
-    float   mScreenHeight = 768;
+    float sw = 100;// 1280;
+    float sh =100;// 768;
 
     // Misc
-    Context mContext;
-    long mLastTime;
-    int mProgram;
+    Context c;
+    long lTime;
+    int p;
 
-    public GLRenderer(Context c)
-    {
-        mContext = c;
-        mLastTime = System.currentTimeMillis() + 100;
+    public GR(Context c){
+        this.c = c;
+        lTime = System.currentTimeMillis() + 100;
     }
 
-    public void onPause()
-    {
+    public void onPause() {
         /* Do stuff to pause the renderer */
     }
 
-    public void onResume()
-    {
+    public void onResume() {
         /* Do stuff to resume the renderer */
-        mLastTime = System.currentTimeMillis();
+        lTime = System.currentTimeMillis();
     }
 
     @Override
@@ -61,18 +52,18 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         long now = System.currentTimeMillis();
 
         // We should make sure we are valid and sane
-        if (mLastTime > now) return;
+        if (lTime > now) return;
 
         // Get the amount of time the last frame took.
-        long elapsed = now - mLastTime;
+        long elapsed = now - lTime;
 
         // Update our example
 
         // Render our example
-        Render(mtrxProjectionAndView);
+        Render(projViewM);
 
         // Save the current time to see how long it took <img src="http://androidblog.reindustries.com/wp-includes/images/smilies/icon_smile.gif" alt=":)" class="wp-smiley"> .
-        mLastTime = now;
+        lTime = now;
 
     }
 
@@ -90,17 +81,17 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, 3,
                 GLES20.GL_FLOAT, false,
-                0, vertexBuffer);
+                0, tri.vBuf);
 
         // Get handle to shape's transformation matrix
         int mtrxhandle = GLES20.glGetUniformLocation(riGraphicTools.sp_SolidColor, "uMVPMatrix");
 
-        // Apply the projection and view transformation
+        // Apply the projM and view transformation
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
         // Draw the triangle
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, tri.idx.length,
+                GLES20.GL_UNSIGNED_SHORT, tri.drawLBuf);
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
@@ -111,28 +102,28 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
 
         // We need to know the current width and height.
-        mScreenWidth = width;
-        mScreenHeight = height;
+        sw = width;
+        sh = height;
 
         // Redo the Viewport, making it fullscreen.
-        GLES20.glViewport(0, 0, (int)mScreenWidth, (int)mScreenHeight);
+        GLES20.glViewport(0, 0, (int) sw, (int) sh);
 
         // Clear our matrices
         for(int i=0;i<16;i++)
         {
-            mtrxProjection[i] = 0.0f;
-            mtrxView[i] = 0.0f;
-            mtrxProjectionAndView[i] = 0.0f;
+            projM[i] = 0.0f;
+            viewM[i] = 0.0f;
+            projViewM[i] = 0.0f;
         }
 
         // Setup our screen width and height for normal sprite translation.
-        Matrix.orthoM(mtrxProjection, 0, 0f, mScreenWidth, 0.0f, mScreenHeight, 0, 50);
+        Matrix.orthoM(projM, 0, 0f, sw, 0.0f, sh, 0, 50);
 
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(mtrxView, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(viewM, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
-        // Calculate the projection and view transformation
-        Matrix.multiplyMM(mtrxProjectionAndView, 0, mtrxProjection, 0, mtrxView, 0);
+        // Calculate the projM and view transformation
+        Matrix.multiplyMM(projViewM, 0, projM, 0, viewM, 0);
 
     }
 
@@ -140,7 +131,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
         // Create the triangle
-        SetupTriangle();
+        tri=new Tri();
 
         // Set the clear color to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -158,30 +149,5 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
     }
 
-    public void SetupTriangle()
-    {
-        // We have create the vertices of our view.
-        vertices = new float[]
-                {10.0f, 200f, 0.0f,
-                        10.0f, 100f, 0.0f,
-                        100f, 100f, 0.0f,
-                };
-
-        indices = new short[] {0, 1, 2}; // loop in the android official tutorial opengles why different order.
-
-        // The vertex buffer.
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
-
-        // initialize byte buffer for the draw list
-        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(indices);
-        drawListBuffer.position(0);
-
-    }
+    private Tri tri;
 }
