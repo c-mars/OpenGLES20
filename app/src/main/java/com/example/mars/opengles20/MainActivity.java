@@ -3,10 +3,9 @@ package com.example.mars.opengles20;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
+
+import com.example.mars.opengles20.gl.Surface;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -19,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         RelativeLayout rl= (RelativeLayout) findViewById(R.id.gamelayout);
-        gs =new GS(this, rl);
+        gs =new Surface(this, rl);
     }
 
     @Override

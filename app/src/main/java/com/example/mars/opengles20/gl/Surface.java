@@ -1,4 +1,4 @@
-package com.example.mars.opengles20;
+package com.example.mars.opengles20.gl;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -8,15 +8,15 @@ import android.widget.RelativeLayout;
 /**
  * Created by mars on 6/22/15.
  */
-public class GS extends GLSurfaceView {
+public class Surface extends GLSurfaceView {
 
-    private GR r;
+    private com.example.mars.opengles20.gl.Renderer r;
 
-    public GS(Context c, ViewGroup vg) {
+    public Surface(Context c, ViewGroup vg) {
         super(c);
         setEGLContextClientVersion(2);
 
-        r = new GR(c);
+        r = new com.example.mars.opengles20.gl.Renderer(c);
         setRenderer(r);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
