@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 /**
- * Created by mars on 6/22/15.
+ * Created by Constantine Mars on 6/22/15.
  */
 public class Surface extends GLSurfaceView {
 

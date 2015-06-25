@@ -9,7 +9,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 /**
- * Created by mars on 6/24/15.
+ * Created by Constantine Mars on 6/24/15.
  */
 public class Triangle {
     private float vertices[];

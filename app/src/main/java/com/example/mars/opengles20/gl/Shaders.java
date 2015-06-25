@@ -18,7 +18,7 @@ public class Shaders {
     private static final String FRAGMENT_SHADER =
             "precision mediump float;" +
                     "void main() {" +
-                    "  gl_FragColor = vec4(0,1,0,1);" +
+                    "  gl_FragColor = vec4(%d,%d,%d,%d);" +
                     "}";
 
     private static int loadShader(int type, String shaderCode){
@@ -30,7 +30,7 @@ public class Shaders {
 
     public Shaders() {
         int vertexShader = Shaders.loadShader(GLES20.GL_VERTEX_SHADER, Shaders.VERTEX_SHADER);
-        int fragmentShader = Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, Shaders.FRAGMENT_SHADER);
+        int fragmentShader = Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, String.format(Shaders.FRAGMENT_SHADER, 1, 1, 0, 1));
 
         Shaders.program = GLES20.glCreateProgram();
         GLES20.glAttachShader(Shaders.program, vertexShader);
