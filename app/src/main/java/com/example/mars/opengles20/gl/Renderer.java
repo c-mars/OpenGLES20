@@ -26,6 +26,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     private Shaders shaders;
     private Triangle triangle;
+    private Circle circle;
 
     public Renderer(Context c) {
         this.c = c;
@@ -37,8 +38,9 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        if(triangle==null && size!=null){ createTriangle(); }
-        if(triangle!=null) {triangle.render(projViewM);}
+//        if(triangle==null && size!=null){ createTriangle(); }
+//        if(triangle!=null) {triangle.render(projViewM);}
+        circle.render();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -68,7 +70,10 @@ public class Renderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
         shaders=new Shaders();
     }
-        private void createTriangle(){
-        triangle = new Triangle(new PointF(size.getWidth()/ 10f, size.getHeight() / 10f), size.getWidth()* 0.8f, size.getHeight()* 0.8f);
+
+    private void createTriangle(){
+            triangle = new Triangle(new PointF(size.getWidth()/ 10f, size.getHeight() / 10f), size.getWidth()* 0.8f, size.getHeight()* 0.8f);
+            float r= (float) (size.getWidth()*0.4);
+            circle=new Circle(r, 6, (float)(size.getWidth()*0.1), (float)(size.getHeight()*0.1));
     }
 }
